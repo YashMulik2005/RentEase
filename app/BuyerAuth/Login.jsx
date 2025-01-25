@@ -33,7 +33,12 @@ const Login = () => {
           secureTextEntry={true}
         />
       </View>
-      <TouchableOpacity className=" bg-primaryBlue p-4 rounded-xl">
+      <TouchableOpacity
+        onPress={() => {
+          router.push("/(tabs)/Home");
+        }}
+        className=" bg-primaryBlue p-4 rounded-xl"
+      >
         <Text className=" text-white font-bold text-center text-xl">Login</Text>
       </TouchableOpacity>
       <View className="">

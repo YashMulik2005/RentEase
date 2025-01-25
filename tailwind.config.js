@@ -10,6 +10,7 @@ module.exports = {
         BlueBackground: "#E4E4FA",
         text: "#101010",
         secondaryBlue: "#C8C8F4",
+        tabBackground: "#F5F5F6",
         secondaryBackground: "#E1E1E1",
         gray: "#6b7280",
       },
