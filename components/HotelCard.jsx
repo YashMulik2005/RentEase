@@ -1,11 +1,17 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const HotelCard = () => {
   return (
-    <View className="bg-white rounded-lg mx-2 w-72">
+    <TouchableOpacity
+      onPress={() => {
+        router.push(`/Room/${1}`);
+      }}
+      className="bg-white rounded-lg mx-2 w-72"
+    >
       <Image
         className=" aspect-square h-72  rounded-t-lg"
         source={require("../assets/images/room.jpg")}
@@ -21,7 +27,7 @@ const HotelCard = () => {
         <Text className=" w-full text-gray">neb ibeiu bbeji jbieb becieb</Text>
         <Text className=" text-primaryBlue font-bold text-xl mt-2">$500 </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

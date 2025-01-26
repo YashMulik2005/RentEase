@@ -1,10 +1,16 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const SearchCard = () => {
   return (
-    <View className="bg-white w-full rounded-lg flex flex-row p-4 my-2">
+    <TouchableOpacity
+      onPress={() => {
+        router.push(`/Room/${1}`);
+      }}
+      className="bg-white w-full rounded-lg flex flex-row p-4 my-2"
+    >
       <View className=" w-[40%]">
         <Image
           className=" h-32 aspect-square rounded-lg"
@@ -24,7 +30,7 @@ const SearchCard = () => {
           $500{" "}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

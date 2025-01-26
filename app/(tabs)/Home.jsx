@@ -13,8 +13,10 @@ import FilterList from "../../components/FilterList";
 import HotelCard from "../../components/HotelCard";
 import axios from "axios";
 import SearchCard from "../../components/SearchCard";
+import useAuth from "../../context/AuthContext";
 
 const Home = () => {
+  const { username } = useAuth();
   const [city, setCity] = useState("Unknown");
   const [country, setCountry] = useState("Unknown");
   const [errorMsg, setErrorMsg] = useState(null);
