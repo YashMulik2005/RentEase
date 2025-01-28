@@ -13,7 +13,7 @@ const SearchCard = () => {
     >
       <View className=" w-[40%]">
         <Image
-          className=" h-32 aspect-square rounded-lg"
+          className=" h-32 w-32 object-cover rounded-lg"
           source={require("../assets/images/room.jpg")}
         />
       </View>
