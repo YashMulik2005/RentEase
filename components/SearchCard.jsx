@@ -11,13 +11,13 @@ const SearchCard = () => {
       }}
       className="bg-white w-full rounded-lg flex flex-row p-4 my-2"
     >
-      <View className=" w-[40%]">
+      <View className=" w-[30%]">
         <Image
-          className=" h-32 w-32 object-cover rounded-lg"
+          className=" h-24 w-24 object-cover rounded-lg"
           source={require("../assets/images/room.jpg")}
         />
       </View>
-      <View className=" relative w-[60%] flex flex-col gap-1">
+      <View className=" relative w-[70%] flex flex-col gap-1">
         <View className=" flex flex-row justify-between">
           <Text className=" w-[75%] font-bold text-xl">Asto vill Hotel </Text>
           <View className=" w-[25%]  flex flex-row gap-1 items-center">
