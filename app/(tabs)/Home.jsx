@@ -20,10 +20,11 @@ const Home = () => {
   const [city, setCity] = useState("Unknown");
   const [country, setCountry] = useState("Unknown");
   const [errorMsg, setErrorMsg] = useState(null);
-  const [locationLoader, setlocationLoader] = useState(true);
+  const [locationLoader, setlocationLoader] = useState(false);
   const { location, setlocation, username } = useAuth();
 
   const checkPermissionAndGetLocation = async () => {
+    setlocationLoader(true);
     const { status } = await Location.getForegroundPermissionsAsync();
 
     if (status === "granted") {
