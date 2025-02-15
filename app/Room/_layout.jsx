@@ -6,6 +6,8 @@ const RoomsLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="[id]" />
+      <Stack.Screen name="BookingCalender" />
+      <Stack.Screen name="ResidentDeatils" />
     </Stack>
   );
 };
