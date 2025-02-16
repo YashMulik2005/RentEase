@@ -97,7 +97,7 @@ const Home = () => {
             <Text className=" text-gray pl-2">Current Location</Text>
             <View className=" flex gap-2 w-full flex-row items-center">
               <EvilIcons name="location" size={30} color="#4C4DDC" />
-              <Text className=" text-xl font-bold">{`${location.city}, ${location.country}`}</Text>
+              <Text className=" text-xl font-bold">{`${location?.city}, ${location?.country}`}</Text>
             </View>
           </View>
           <View>

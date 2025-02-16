@@ -147,7 +147,6 @@ const ResidentDeatils = () => {
         transparent={true}
         className=" relative"
         onRequestClose={() => setpaymentModal(false)}
-        presentationStyle="pageSheet"
       >
         <View className=" w-full p-5 absolute bottom-0 bg-tabBackground">
           <View className=" flex flex-row justify-end w-full">
