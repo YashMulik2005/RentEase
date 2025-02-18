@@ -5,6 +5,7 @@ const SellerAuthLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" />
+      <Stack.Screen name="SignUp" />
     </Stack>
   );
 };
