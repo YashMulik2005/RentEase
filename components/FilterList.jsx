@@ -31,7 +31,7 @@ const FilterList = () => {
   ];
   return (
     <View className=" w-full">
-      <ScrollView horizontal={true}>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
         {arr.map((item, index) => {
           return (
             <TouchableOpacity
