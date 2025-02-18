@@ -14,15 +14,21 @@ import HotelCard from "../../components/HotelCard";
 import axios from "axios";
 import SearchCard from "../../components/SearchCard";
 import useAuth from "../../context/AuthContext";
+import { StatusBar } from "expo-status-bar";
+import { getMethod } from "../../utils/apiService";
 
 const Home = () => {
-  const { username } = useAuth();
+  // const { username } = useAuth();
   const [city, setCity] = useState("Unknown");
   const [country, setCountry] = useState("Unknown");
   const [errorMsg, setErrorMsg] = useState(null);
-  const [locationLoader, setlocationLoader] = useState(true);
+  const [locationLoader, setlocationLoader] = useState(false);
+  const { location, setlocation, username } = useAuth();
+  const [radomRoomsData, setradomRoomsData] = useState();
+  const [locationRooms, setlocationRooms] = useState();
 
   const checkPermissionAndGetLocation = async () => {
+    setlocationLoader(true);
     const { status } = await Location.getForegroundPermissionsAsync();
 
     if (status === "granted") {
@@ -59,9 +65,17 @@ const Home = () => {
         `https://api.opencagedata.com/geocode/v1/json?q=${lat}%2C${lon}&key=95902c715dc643b0889465bcf24d0775`
       );
       const components = response.data.results[0]?.components;
-      setCity(components?.city || "Unknown city");
-      setCountry(components?.country || "Unknown country");
+
+      setlocation({
+        city: components?.city || "Unknown city",
+        country: components?.country || "Unknown country",
+      });
+
       console.log(components);
+
+      // setCity(components?.city || "Unknown city");
+      // setCountry(components?.country || "Unknown country");
+      // console.log(components);
       setlocationLoader(false);
     } catch (error) {
       console.error("Error fetching city information:", error);
@@ -70,8 +84,32 @@ const Home = () => {
   };
 
   useEffect(() => {
-    checkPermissionAndGetLocation();
+    if (location == null) {
+      checkPermissionAndGetLocation();
+    }
   }, []);
+
+  const getRandomData = async () => {
+    console.log("hubuy");
+    const res = await getMethod("room/random");
+    console.log(res);
+    setradomRoomsData(res.data);
+  };
+
+  const getRoomsByLocation = async () => {
+    const res = await getMethod(
+      `room/location/${location.city}/${location.state}`
+    );
+    console.log("location data: " + res);
+    setlocationRooms(res.data);
+  };
+
+  useEffect(() => {
+    if (location != null) {
+      getRandomData();
+      getRoomsByLocation();
+    }
+  }, [location]);
 
   return (
     <SafeAreaView className=" bg-tabBackground h-full p-4 flex flex-col items-center gap-6">
@@ -80,39 +118,48 @@ const Home = () => {
           <ActivityIndicator size="large" color="#4C4DDC" />
         </View>
       ) : (
-        <>
-          <View className=" w-full flex flex-col justify-center gap-1 mt-3">
-            <Text className=" text-gray pl-2">Current Location</Text>
-            <View className=" flex gap-2 w-full flex-row items-center">
-              <EvilIcons name="location" size={30} color="#4C4DDC" />
-              <Text className=" text-xl font-bold">{`${city}, ${country}`}</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          className="  w-full h-screen"
+        >
+          <View className=" flex flex-col gap-4">
+            <View className=" w-full flex flex-col justify-center gap-1 mt-3">
+              <Text className=" text-gray pl-2">Current Location</Text>
+              <View className=" flex gap-2 w-full flex-row items-center">
+                <EvilIcons name="location" size={30} color="#4C4DDC" />
+                <Text className=" text-xl font-bold">{`${location?.city}, ${location?.country}`}</Text>
+              </View>
             </View>
-          </View>
-          <View>
-            <FilterList />
-          </View>
-          <View className=" w-full flex flex-col gap-3">
-            <Text className=" text-xl font-bold pl-1">Near location</Text>
             <View>
+              <FilterList />
+            </View>
+            <View className=" w-full flex flex-col gap-3">
+              <Text className=" text-xl font-bold pl-1">Near location</Text>
+              <View>
+                <FlatList
+                  data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                  keyExtractor={(item) => item.toString()}
+                  renderItem={({ item }) => <HotelCard />}
+                  horizontal
+                  // showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  //numColumns={2}
+                />
+              </View>
+            </View>
+            <View className=" w-full">
+              <Text className="text-xl font-bold pl-1">Popular hotels</Text>
               <FlatList
-                data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                data={radomRoomsData}
                 keyExtractor={(item) => item.toString()}
-                renderItem={({ item }) => <HotelCard />}
-                horizontal
-                //numColumns={2}
+                renderItem={({ item }) => <SearchCard />}
+                showsVerticalScrollIndicator={false}
               />
             </View>
           </View>
-          <View className=" w-full">
-            <Text className="text-xl font-bold pl-1">Popular hotels</Text>
-            <FlatList
-              data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-              keyExtractor={(item) => item.toString()}
-              renderItem={({ item }) => <SearchCard />}
-            />
-          </View>
-        </>
+        </ScrollView>
       )}
+      <StatusBar />
     </SafeAreaView>
   );
 };
