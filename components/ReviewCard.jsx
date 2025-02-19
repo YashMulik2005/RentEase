@@ -13,7 +13,7 @@ const ReviewCard = () => {
           />
         </View>
         <View className=" w-[80%]">
-          <Text className=" text-xl font-bold">Yash Mulik</Text>
+          <Text className=" text-xl font-bold">John Dev</Text>
           <Text className=" text-gray">May 12, 2024</Text>
         </View>
       </View>

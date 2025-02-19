@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { View, Text } from "react-native";
-import React from "react";
-
-const BookingCalender = () => {
-  return (
-    <View>
-      <Text>BookingCalender</Text>
-    </View>
-=======
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -111,7 +101,6 @@ const BookingCalender = () => {
         </View>
       </View>
     </SafeAreaView>
->>>>>>> 143b171605fb01fa0ec76433a96a3c98e63a8ac0
   );
 };
 

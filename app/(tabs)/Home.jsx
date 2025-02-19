@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  ActivityIndicator,
-  FlatList,
-} from "react-native";
+import { View, Text, ActivityIndicator, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import { EvilIcons } from "@expo/vector-icons";
@@ -16,6 +10,7 @@ import SearchCard from "../../components/SearchCard";
 import useAuth from "../../context/AuthContext";
 import { StatusBar } from "expo-status-bar";
 import { getMethod } from "../../utils/apiService";
+import { ScrollView } from "react-native-virtualized-view";
 
 const Home = () => {
   // const { username } = useAuth();
@@ -32,10 +27,8 @@ const Home = () => {
     const { status } = await Location.getForegroundPermissionsAsync();
 
     if (status === "granted") {
-      // Permission already granted
       getLocation();
     } else {
-      // Ask for permission if not granted
       const { status: newStatus } =
         await Location.requestForegroundPermissionsAsync();
       if (newStatus === "granted") {
@@ -68,14 +61,8 @@ const Home = () => {
 
       setlocation({
         city: components?.city || "Unknown city",
-        country: components?.country || "Unknown country",
+        state: components?.state || "Unknown country",
       });
-
-      console.log(components);
-
-      // setCity(components?.city || "Unknown city");
-      // setCountry(components?.country || "Unknown country");
-      // console.log(components);
       setlocationLoader(false);
     } catch (error) {
       console.error("Error fetching city information:", error);
@@ -90,9 +77,7 @@ const Home = () => {
   }, []);
 
   const getRandomData = async () => {
-    console.log("hubuy");
     const res = await getMethod("room/random");
-    console.log(res);
     setradomRoomsData(res.data);
   };
 
@@ -100,7 +85,6 @@ const Home = () => {
     const res = await getMethod(
       `room/location/${location.city}/${location.state}`
     );
-    console.log("location data: " + res);
     setlocationRooms(res.data);
   };
 
@@ -127,7 +111,7 @@ const Home = () => {
               <Text className=" text-gray pl-2">Current Location</Text>
               <View className=" flex gap-2 w-full flex-row items-center">
                 <EvilIcons name="location" size={30} color="#4C4DDC" />
-                <Text className=" text-xl font-bold">{`${location?.city}, ${location?.country}`}</Text>
+                <Text className=" text-xl font-bold">{`${location?.city}, ${location?.state}`}</Text>
               </View>
             </View>
             <View>
@@ -137,9 +121,9 @@ const Home = () => {
               <Text className=" text-xl font-bold pl-1">Near location</Text>
               <View>
                 <FlatList
-                  data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-                  keyExtractor={(item) => item.toString()}
-                  renderItem={({ item }) => <HotelCard />}
+                  data={locationRooms}
+                  keyExtractor={(item) => item?._id.toString()}
+                  renderItem={({ item }) => <HotelCard data={item} />}
                   horizontal
                   // showsVerticalScrollIndicator={false}
                   showsHorizontalScrollIndicator={false}
@@ -151,8 +135,8 @@ const Home = () => {
               <Text className="text-xl font-bold pl-1">Popular hotels</Text>
               <FlatList
                 data={radomRoomsData}
-                keyExtractor={(item) => item.toString()}
-                renderItem={({ item }) => <SearchCard />}
+                keyExtractor={(item) => item?._id.toString()}
+                renderItem={({ item }) => <SearchCard data={item} />}
                 showsVerticalScrollIndicator={false}
               />
             </View>

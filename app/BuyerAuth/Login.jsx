@@ -4,6 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,12 +20,10 @@ const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const { setlocation } = useAuth();
+  const [loader, setloader] = useState(false);
   const onSubmit = async () => {
     try {
-      console.log(email);
-      console.log(password);
-      console.log("submit");
-
+      setloader(true);
       const res = await postMethod("auth/userlogin", {
         email: email,
         password: password,
@@ -36,7 +35,7 @@ const Login = () => {
         const result = await getMethod("user/getuser", res?.data?.token);
         console.log(result?.data);
         console.log(res?.data?.token);
-        await AsyncStorage.setItem("user", JSON.stringify(res?.data));
+        await AsyncStorage.setItem("user", JSON.stringify(result?.data));
         setlocation(null);
         router.push("/(tabs)/Home");
       }
@@ -46,6 +45,7 @@ const Login = () => {
         console.log("Invalid credentials");
       }
     }
+    setloader(false);
   };
 
   return (
@@ -102,9 +102,13 @@ const Login = () => {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                 >
-                  <Text className="text-white font-bold text-center text-xl">
-                    Login
-                  </Text>
+                  {loader ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text className="text-white font-bold text-center text-xl">
+                      Login
+                    </Text>
+                  )}
                 </LinearGradient>
               </TouchableOpacity>
             </View>

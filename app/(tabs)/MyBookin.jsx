@@ -31,7 +31,7 @@ const MyBookin = () => {
 
       <View className="w-full">
         <TextInput
-          className=" border w-full border-zinc-300 px-4 py-3 rounded-lg text-lg"
+          className=" w-full bg-zinc-200 px-4 py-3 rounded-lg text-lg"
           keyboardType="ascii-capable"
           placeholder="Search"
         />
@@ -43,6 +43,7 @@ const MyBookin = () => {
           data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
           keyExtractor={(item) => item.toString()}
           renderItem={({ item }) => <BookingCard />}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </SafeAreaView>

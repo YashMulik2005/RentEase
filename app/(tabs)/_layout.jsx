@@ -50,6 +50,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="MyBookin"
         options={{
+          tabBarLabel: "Bookings",
           tabBarIcon: ({ color, focused }) => (
             <Fontisto
               name={focused ? "bookmark-alt" : "bookmark"}
