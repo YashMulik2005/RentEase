@@ -1,105 +1,191 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { Calendar } from "react-native-calendars";
 import { AntDesign } from "@expo/vector-icons";
-import CalendarPicker from "react-native-calendar-picker";
 import { router } from "expo-router";
-import OfferCard from "../../components/OfferCard";
-import { ScrollView } from "react-native-virtualized-view";
+import moment from "moment";
+import useAuth from "../../context/AuthContext";
+import { getMethod } from "../../utils/apiService";
 
 const BookingCalender = () => {
-  const onDateChange = (date, type) => {
-    console.log(JSON.stringify(date));
+  const [dates, setDates] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [bookedCheckInDates, setbookedCheckInDates] = useState([]);
+  const [bookedCheckOutDates, setbookedCheckOutDates] = useState([]);
+  const { bookingDetails, setbookingDetails } = useAuth();
+  const [loader, setloader] = useState(true);
+
+  // const bookedCheckInDates = ["2025-02-15", "2025-02-20", "2025-02-28"];
+
+  const getData = async () => {
+    setloader(true);
+    try {
+      const res = await getMethod(`booking/room/${bookingDetails.room_id}`);
+      const result = res?.data;
+      setbookedCheckInDates(result?.checkInDates);
+      setbookedCheckOutDates(result?.checkOutDates);
+    } catch (err) {
+      console.log(err);
+    }
+    setloader(false);
   };
+
+  useEffect(() => {
+    generateNextTwoMonths();
+    getData();
+  }, []);
+
+  const generateNextTwoMonths = () => {
+    let tempDates = [];
+    let currentDate = moment();
+    let endDate = moment().add(2, "months");
+
+    while (currentDate.isBefore(endDate)) {
+      tempDates.push({
+        date: currentDate.format("YYYY-MM-DD"),
+        day: currentDate.format("ddd"),
+      });
+      currentDate.add(1, "day");
+    }
+    setDates(tempDates);
+  };
+
   return (
     <SafeAreaView className="bg-white h-full w-full">
-      <View className=" p-4 h-full w-full flex flex-col items-center gap-6">
-        <View className="w-full flex flex-row items-center">
-          <TouchableOpacity
-            onPress={() => {
-              router.back();
-            }}
-            className="p-1 rounded-lg border border-zinc-300 w-[10%]"
-          >
-            <AntDesign name="left" size={24} color="black" />
-          </TouchableOpacity>
-          <View className=" w-[80%]">
-            <Text className=" text-2xl font-bold text-center">Schedule</Text>
-          </View>
-          <View className="w-[10%]">{/* <Text>nibu</Text> */}</View>
+      {loader ? (
+        <View>
+          <Text>loading</Text>
         </View>
-
-        <View className=" w-full h-full">
-          <ScrollView>
-            <View className="w-full p-4 rounded-lg bg-tabBackground">
-              {/* <Calendar
-            style={{
-              borderRadius: 10,
-              elevation: 4,
-              backgroundColor: "#F5F5F6",
-            }}
-            minDate="2025-02-15"
-            markedDates={{
-              "2025-02-17": {
-                selected: true,
-                marked: true,
-                selectedColor: "#5C67F2",
-              },
-              "2024-09-25": {
-                selected: true,
-                marked: true,
-                selectedColor: "#5C67F2",
-              },
-            }}
-            theme={{
-              textSectionTitleColor: "#5C67F2",
-              selectedDayBackgroundColor: "#5C67F2",
-              selectedDayTextColor: "#ffffff",
-              todayTextColor: "#5C67F2",
-              dayTextColor: "#2d4150",
-              textDisabledColor: "#d9e1e8",
-              arrowColor: "#5C67F2",
-              monthTextColor: "#5C67F2",
-              indicatorColor: "#5C67F2",
-              textDayFontWeight: "300",
-              textMonthFontWeight: "bold",
-              textDayHeaderFontWeight: "500",
-              textDayFontSize: 16,
-              textMonthFontSize: 18,
-              textDayHeaderFontSize: 14,
-            }}
-          /> */}
-              <CalendarPicker
-                startFromMonday={true}
-                allowRangeSelection={true}
-                minDate={new Date()}
-                // maxDate={maxDate}
-                selectedDayColor="#4C4DDC"
-                selectedDayTextColor="#FFFFFF"
-                onDateChange={onDateChange}
-                backgroundColor="#F5F5F6"
-                disabledDates={["2025-02-22", "2025-02-23"]}
-                // previousTitle="<"
-                // nextTitle=">"
-              />
-            </View>
-
-            <View>
-              <Text className=" font-bold text-lg mb-2">Offers available</Text>
-              <OfferCard />
-              <OfferCard />
-            </View>
-
+      ) : (
+        <View className="p-4 h-full w-full flex flex-col items-center gap-6">
+          <View className="w-full flex flex-row items-center">
             <TouchableOpacity
-              onPress={() => router.push("./ResidentDeatils")}
-              className="w-full  bg-primaryBlue p-3 my-2 items-center rounded-lg"
+              onPress={() => router.back()}
+              className="p-1 rounded-lg border border-zinc-300 w-[10%]"
             >
-              <Text className=" text-white font-bold text-lg">Booking Now</Text>
+              <AntDesign name="left" size={24} color="black" />
             </TouchableOpacity>
-          </ScrollView>
+            <View className="w-[80%]">
+              <Text className="text-2xl font-bold text-center">Schedule</Text>
+            </View>
+            <View className="w-[10%]" />
+          </View>
+          <View className=" w-full h-full flex flex-col items-center justify-between">
+            <View className=" w-full h-[86%]">
+              <View className="w-full">
+                <Text className="text-lg font-semibold mb-2">
+                  Select Check-in Date
+                </Text>
+                <FlatList
+                  data={dates}
+                  horizontal
+                  keyExtractor={(item) => item.date}
+                  renderItem={({ item }) => {
+                    const isBooked = bookedCheckInDates.includes(item.date);
+                    return (
+                      <TouchableOpacity
+                        onPress={() => !isBooked && setStartDate(item.date)}
+                        disabled={isBooked}
+                        className={`p-3 px-7 h-28 flex flex-col justify-center items-center m-1 rounded-full 
+            ${
+              isBooked
+                ? "bg-gray opacity-70"
+                : startDate === item.date
+                ? "bg-[#4C4DDC]"
+                : "bg-zinc-200"
+            }`}
+                      >
+                        <Text
+                          className={`${
+                            startDate === item.date ? " text-white" : ""
+                          } text-center text-xl`}
+                        >
+                          {item.date.split("-")[2]}
+                        </Text>
+                        <Text
+                          className={`${
+                            startDate === item.date ? " text-white" : ""
+                          } text-center text-xl font-bold`}
+                        >
+                          {item.day}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+
+                <Text className="text-lg font-semibold mt-4 mb-2">
+                  Select Check-out Date
+                </Text>
+                <FlatList
+                  data={dates}
+                  horizontal
+                  keyExtractor={(item) => item.date}
+                  renderItem={({ item }) => {
+                    const isBooked = bookedCheckOutDates.includes(item.date);
+                    const isBeforeCheckIn =
+                      startDate &&
+                      moment(item.date).isBefore(moment(startDate));
+
+                    return (
+                      <TouchableOpacity
+                        onPress={() =>
+                          !isBooked && !isBeforeCheckIn && setEndDate(item.date)
+                        }
+                        disabled={isBooked || isBeforeCheckIn}
+                        className={`p-3 px-7 h-28 flex flex-col justify-center items-center m-1 rounded-full
+    ${isBooked || isBeforeCheckIn ? "bg-gray opacity-70" : ""}
+    ${
+      !isBooked && !isBeforeCheckIn && endDate === item.date
+        ? "bg-[#4C4DDC] text-white"
+        : ""
+    }
+    ${
+      !isBooked && !isBeforeCheckIn && endDate !== item.date
+        ? "bg-zinc-200"
+        : ""
+    }`}
+                      >
+                        <Text
+                          className={`${
+                            endDate === item.date ? " text-white" : ""
+                          } text-center text-xl`}
+                        >
+                          {item.date.split("-")[2]}
+                        </Text>
+                        <Text
+                          className={`${
+                            endDate === item.date ? " text-white" : ""
+                          } text-center text-xl`}
+                        >
+                          {item.day}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              </View>
+            </View>
+
+            <View className="w-full h-[14%]">
+              <TouchableOpacity
+                onPress={() => {
+                  setbookingDetails({
+                    ...bookingDetails,
+                    check_in_date: startDate,
+                    check_out_date: endDate,
+                  });
+                  router.push("./ResidentDeatils");
+                }}
+                className=" w-full bg-primaryBlue p-3 my-2 items-center rounded-lg"
+              >
+                <Text className="text-white font-bold text-lg">Book Now</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 };

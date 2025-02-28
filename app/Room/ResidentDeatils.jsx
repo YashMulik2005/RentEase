@@ -6,25 +6,29 @@ import {
   ScrollView,
   Modal,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { ScrollView } from "react-native-virtualized-view";
 import { Dropdown } from "react-native-element-dropdown";
 import { router } from "expo-router";
-// import { Calendar } from "react-native-calendars";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import useAuth from "../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { postMethod } from "../../utils/apiService";
 
 const ResidentDeatils = () => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [residents, setResidents] = useState([]);
+  const [userData, setuserData] = useState();
   const [currentResident, setCurrentResident] = useState({
     name: "",
     age: "",
     gender: "",
   });
+
   const [paymentModal, setpaymentModal] = useState(false);
   const [couponCode, setcouponCode] = useState("");
-
+  const { bookingDetails, setbookingDetails } = useAuth();
+  console.log(bookingDetails);
   const genderData = [
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
@@ -33,18 +37,46 @@ const ResidentDeatils = () => {
 
   const addResident = () => {
     if (currentResident.name && currentResident.age && currentResident.gender) {
-      setResidents([...residents, currentResident]);
+      const updatedResidents = [...residents, currentResident];
+      setResidents(updatedResidents);
+
+      setbookingDetails({
+        ...bookingDetails,
+        guest_details: updatedResidents,
+      });
+
       setCurrentResident({ name: "", age: "", gender: "" });
+      console.log("in function", bookingDetails);
     } else {
       alert("Please fill all the fields before adding a resident.");
     }
   };
 
+  const GetUser = async () => {
+    const user = await AsyncStorage.getItem("token");
+    setuserData(user);
+  };
+
+  const bookRoom = async () => {
+    try {
+      const res = await postMethod("booking", bookingDetails, userData);
+      if (res.status == 201) {
+        console.log("room booked");
+        router.push("../(tabs)/MyBookin");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    GetUser();
+  }, []);
+
   return (
     <SafeAreaView className="bg-white h-full w-full">
       <View className="p-4 h-full w-full flex flex-col">
         <View className="w-full h-[90%] flex flex-col">
-          {/* Render form fields for the current resident */}
           <View className=" w-full h-[30%]">
             <View className="mb-2">
               <Text className="text-lg font-semibold text-gray my-1">
@@ -56,7 +88,7 @@ const ResidentDeatils = () => {
                 onChangeText={(text) =>
                   setCurrentResident({ ...currentResident, name: text })
                 }
-                placeholder="username"
+                placeholder="Name"
               />
             </View>
             <View className="flex flex-row gap-3 w-full">
@@ -101,7 +133,6 @@ const ResidentDeatils = () => {
                 />
               </View>
             </View>
-            {/* Button to add a new resident */}
             <TouchableOpacity
               onPress={addResident}
               className="bg-primaryBlue p-3 my-2 rounded-lg items-center"
@@ -110,7 +141,6 @@ const ResidentDeatils = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Render all added residents */}
           <View className="mt-4 h-[70%]">
             <ScrollView>
               <Text className="text-xl font-semibold text-gray">
@@ -133,7 +163,13 @@ const ResidentDeatils = () => {
 
         <View className="w-full h-[10%] flex flex-col justify-center items-center">
           <TouchableOpacity
-            onPress={() => setpaymentModal(true)}
+            onPress={async () => {
+              setbookingDetails({
+                ...bookingDetails,
+                total_guests: bookingDetails.guest_details.length,
+              });
+              setpaymentModal(true);
+            }}
             className="w-full bg-primaryBlue p-3 my-2 items-center rounded-lg"
           >
             <Text className="text-white font-bold text-lg">Make payment</Text>
@@ -154,7 +190,6 @@ const ResidentDeatils = () => {
               onPress={() => setpaymentModal(false)}
               className=" my-1"
             >
-              {/* <Text>cancel</Text> */}
               <MaterialIcons name="cancel" size={27} color="black" />
             </TouchableOpacity>
           </View>
@@ -173,7 +208,7 @@ const ResidentDeatils = () => {
                 </Text>
               </View>
               <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">platfrom charges:</Text>
+                <Text className=" text-xl font-bold">Platform charges:</Text>
                 <Text className=" text-xl font-bold text-primaryBlue">
                   4500 ₹
                 </Text>
@@ -192,7 +227,7 @@ const ResidentDeatils = () => {
                 </Text>
                 <TextInput
                   className="border border-gray px-4 py-3 rounded-lg text-lg"
-                  value={currentResident.name}
+                  value={couponCode}
                   onChangeText={(text) => setcouponCode(text)}
                   placeholder="Coupon Code"
                 />
@@ -200,7 +235,7 @@ const ResidentDeatils = () => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                router.push("../(tabs)/MyBookin");
+                bookRoom();
               }}
               className="w-full bg-primaryBlue p-3 my-2 items-center rounded-lg"
             >

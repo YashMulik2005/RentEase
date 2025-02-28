@@ -17,16 +17,17 @@ import ReadMore from "../../components/ReadMore";
 import ReviewCard from "../../components/ReviewCard";
 import { useRoute } from "@react-navigation/native";
 import { getMethod } from "../../utils/apiService";
+import useAuth from "../../context/AuthContext";
 
 const Room = () => {
   const route = useRoute();
   const { id } = route.params;
-  console.log(id);
   const [visible, setvisible] = useState(false);
   const [selectedIndex, setselectedIndex] = useState();
   const router = useRouter();
   const [hotelData, sethotelData] = useState();
   const [loader, setloader] = useState(false);
+  const { bookingDetails, setbookingDetails } = useAuth();
 
   const getData = async () => {
     setloader(true);
@@ -172,7 +173,12 @@ const Room = () => {
             </View>
             <View className=" h-[5%] flex flex-col justify-center items-center">
               <TouchableOpacity
-                onPress={() => router.push("./BookingCalender")}
+                onPress={() => {
+                  setbookingDetails({
+                    room_id: id,
+                  });
+                  router.push("./BookingCalender");
+                }}
                 className="w-full bg-primaryBlue p-3 items-center rounded-lg"
               >
                 <Text className=" text-white font-bold text-lg">
