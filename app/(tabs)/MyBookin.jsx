@@ -5,13 +5,34 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import BookingCard from "../../components/BookingCard";
 import { router } from "expo-router";
+import { getMethod } from "../../utils/apiService";
+import useAuth from "../../context/AuthContext";
 
 const MyBookin = () => {
+  const [userData, setuserData] = useState();
+  const [data, setdata] = useState();
+  const { token } = useAuth();
+
+  const getData = async () => {
+    const res = await getMethod(`booking`, token);
+    console.log("nj ", res.data);
+    setdata(res?.data);
+  };
+
+  // const GetUser = async () => {
+  //   const user = await AsyncStorage.getItem("token");
+  //   setuserData(user);
+  // };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <SafeAreaView className=" bg-tabBackground h-full w-full p-4 flex flex-col items-center gap-6">
       <View className="w-full flex flex-row items-center">
@@ -40,9 +61,9 @@ const MyBookin = () => {
       <View className="w-full">
         <Text className=" text-xl font-semibold">Bookings</Text>
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          data={data}
           keyExtractor={(item) => item.toString()}
-          renderItem={({ item }) => <BookingCard />}
+          renderItem={({ item }) => <BookingCard data={item} />}
           showsVerticalScrollIndicator={false}
         />
       </View>

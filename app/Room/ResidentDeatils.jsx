@@ -28,6 +28,15 @@ const ResidentDeatils = () => {
   const [paymentModal, setpaymentModal] = useState(false);
   const [couponCode, setcouponCode] = useState("");
   const { bookingDetails, setbookingDetails } = useAuth();
+  const [amount, setAmount] = useState(bookingDetails?.amount || 0);
+  const [tax, setTax] = useState((amount * 0.05).toFixed(2));
+  const [platformCharge, setPlatformCharge] = useState(
+    (amount * 0.01).toFixed(2)
+  );
+  const [totalAmount, setTotalAmount] = useState(
+    (amount + parseFloat(tax) + parseFloat(platformCharge)).toFixed(2)
+  );
+
   console.log(bookingDetails);
   const genderData = [
     { label: "Male", value: "male" },
@@ -167,6 +176,7 @@ const ResidentDeatils = () => {
               setbookingDetails({
                 ...bookingDetails,
                 total_guests: bookingDetails.guest_details.length,
+                amount: totalAmount,
               });
               setpaymentModal(true);
             }}
@@ -188,7 +198,7 @@ const ResidentDeatils = () => {
           <View className=" flex flex-row justify-end w-full">
             <TouchableOpacity
               onPress={() => setpaymentModal(false)}
-              className=" my-1"
+              className=" my-2"
             >
               <MaterialIcons name="cancel" size={27} color="black" />
             </TouchableOpacity>
@@ -198,25 +208,30 @@ const ResidentDeatils = () => {
               <View className=" flex flex-row justify-between">
                 <Text className=" text-xl font-bold">Hotel charge:</Text>
                 <Text className=" text-xl font-bold text-primaryBlue">
-                  4500 ₹
+                  {amount} ₹
                 </Text>
               </View>
               <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">Tax:</Text>
+                <Text className=" text-xl font-bold">
+                  Tax <Text className=" font-normal text-zinc-500">(5%) </Text>:
+                </Text>
                 <Text className=" text-xl font-bold text-primaryBlue">
-                  4500 ₹
+                  {tax} ₹
                 </Text>
               </View>
               <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">Platform charges:</Text>
+                <Text className=" text-xl font-bold">
+                  Platform charges{" "}
+                  <Text className=" font-normal text-zinc-500">(1%) </Text>:
+                </Text>
                 <Text className=" text-xl font-bold text-primaryBlue">
-                  4500 ₹
+                  {platformCharge} ₹
                 </Text>
               </View>
               <View className=" flex flex-row justify-between">
                 <Text className=" text-xl font-bold">Total:</Text>
                 <Text className=" text-xl font-bold text-primaryBlue">
-                  8000 ₹
+                  {totalAmount} ₹
                 </Text>
               </View>
             </View>

@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [username, setusername] = useState("Yash");
   const [location, setlocation] = useState(null);
   const [bookingDetails, setbookingDetails] = useState({});
+  const [token, settoken] = useState(null);
 
   const values = {
     username,
@@ -14,6 +15,8 @@ export const AuthProvider = ({ children }) => {
     setlocation,
     bookingDetails,
     setbookingDetails,
+    token,
+    settoken,
   };
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 };

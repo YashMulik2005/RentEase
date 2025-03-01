@@ -85,7 +85,7 @@ const Search = () => {
   const [state, setState] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Fetch search results
@@ -201,7 +201,7 @@ const Search = () => {
         <Text className="text-xl font-semibold">Results</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
-        ) : results.length > 0 ? (
+        ) : results?.length > 0 ? (
           <FlatList
             data={results}
             keyExtractor={(item, index) => index.toString()}

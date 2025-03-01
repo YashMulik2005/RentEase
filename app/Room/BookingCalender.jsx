@@ -34,6 +34,7 @@ const BookingCalender = () => {
   useEffect(() => {
     generateNextTwoMonths();
     getData();
+    console.log(bookingDetails);
   }, []);
 
   const generateNextTwoMonths = () => {
@@ -82,7 +83,7 @@ const BookingCalender = () => {
                   horizontal
                   keyExtractor={(item) => item.date}
                   renderItem={({ item }) => {
-                    const isBooked = bookedCheckInDates.includes(item.date);
+                    const isBooked = bookedCheckInDates?.includes(item.date);
                     return (
                       <TouchableOpacity
                         onPress={() => !isBooked && setStartDate(item.date)}
@@ -123,7 +124,7 @@ const BookingCalender = () => {
                   horizontal
                   keyExtractor={(item) => item.date}
                   renderItem={({ item }) => {
-                    const isBooked = bookedCheckOutDates.includes(item.date);
+                    const isBooked = bookedCheckOutDates?.includes(item.date);
                     const isBeforeCheckIn =
                       startDate &&
                       moment(item.date).isBefore(moment(startDate));
@@ -171,10 +172,13 @@ const BookingCalender = () => {
             <View className="w-full h-[14%]">
               <TouchableOpacity
                 onPress={() => {
+                  const diff = moment(endDate).diff(moment(startDate), "days");
+                  const newamount = (diff + 1) * bookingDetails.amount;
                   setbookingDetails({
                     ...bookingDetails,
                     check_in_date: startDate,
                     check_out_date: endDate,
+                    amount: newamount,
                   });
                   router.push("./ResidentDeatils");
                 }}

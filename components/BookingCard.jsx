@@ -1,20 +1,26 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import React from "react";
+import moment from "moment";
 
-const BookingCard = () => {
+const BookingCard = ({ data }) => {
   return (
     <TouchableOpacity className="bg-white w-full rounded-lg flex flex-col p-4 my-2">
       <View className="w-full flex flex-row gap-4">
         <View className="w-[15%]">
           <Image
             className="h-16 aspect-square rounded-lg"
-            source={require("../assets/images/room.jpg")}
+            source={{ uri: data?.room_id?.titleImage }}
           />
         </View>
         <View className="w-[85%]">
-          <Text className=" font-semibold text-lg">guyvd hvdcudv vducydv</Text>
+          <Text className=" font-semibold text-lg">
+            {data?.room_id?.owner_id?.hotelName}
+          </Text>
           <Text className=" text-gray font-semibold">
-            Start From:<Text className=" text-green-800">12 january 2025</Text>
+            Start From:
+            <Text className=" text-green-800">
+              {moment(data?.check_in_date).format("DD-MM-YYYY")}
+            </Text>
           </Text>
         </View>
       </View>
@@ -25,12 +31,20 @@ const BookingCard = () => {
           <Text className=" text-gray font-semibold">
             Address:{" "}
             <Text className=" text-black">
-              Akshya Nagar 1st Block 1st Cross, Rammurthy nagar,
-              Bangalore-560016
+              {data?.room_id?.owner_id?.apartment},{" "}
+              {data?.room_id?.owner_id?.streetName},{" "}
+              {data?.room_id?.owner_id?.city},{data?.room_id?.owner_id?.state}
             </Text>
           </Text>
           <Text className=" text-gray font-semibold">
-            Duration: <Text className=" text-black">2 weeks</Text>
+            Duration:{" "}
+            <Text className=" text-black">
+              {moment(data?.check_out_date).diff(
+                moment(data?.check_in_date),
+                "days"
+              ) + 1}{" "}
+              Days
+            </Text>
           </Text>
         </View>
         <View className=" w-[20%] flex flex-col justify-end">

@@ -21,6 +21,7 @@ const Login = () => {
   const [password, setpassword] = useState("");
   const { setlocation } = useAuth();
   const [loader, setloader] = useState(false);
+  const { token, settoken } = useAuth();
   const onSubmit = async () => {
     try {
       setloader(true);
@@ -35,6 +36,7 @@ const Login = () => {
         const result = await getMethod("user/getuser", res?.data?.token);
         console.log(result?.data);
         console.log(res?.data?.token);
+        settoken(res?.data?.token);
         await AsyncStorage.setItem("user", JSON.stringify(result?.data));
         setlocation(null);
         router.push("/(tabs)/Home");

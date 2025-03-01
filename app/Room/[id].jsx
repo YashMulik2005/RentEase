@@ -176,6 +176,7 @@ const Room = () => {
                 onPress={() => {
                   setbookingDetails({
                     room_id: id,
+                    amount: hotelData?.price?.$numberDecimal,
                   });
                   router.push("./BookingCalender");
                 }}
