@@ -1,8 +1,32 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Button,
+  Alert,
+} from "react-native";
 import React from "react";
 import moment from "moment";
+import { getMethod } from "../utils/apiService";
 
 const BookingCard = ({ data }) => {
+  const DownloadReceipt = async (receiptId) => {
+    // try {
+    //   const receiptUrl = `https://your-api-url.com/booking/receipt/${receiptId}`;
+    //   const fileUri = FileSystem.documentDirectory + "receipt.pdf";
+    //   const { uri } = await FileSystem.downloadAsync(receiptUrl, fileUri);
+    //   if (await Sharing.isAvailableAsync()) {
+    //     await Sharing.shareAsync(uri);
+    //   } else {
+    //     Alert.alert("Downloaded", "Receipt saved at: " + uri);
+    //   }
+    // } catch (error) {
+    //   Alert.alert("Error", "Failed to download receipt.");
+    //   console.error(error);
+    // }
+  };
+
   return (
     <TouchableOpacity className="bg-white w-full rounded-lg flex flex-col p-4 my-2">
       <View className="w-full flex flex-row gap-4">
@@ -48,7 +72,10 @@ const BookingCard = ({ data }) => {
           </Text>
         </View>
         <View className=" w-[20%] flex flex-col justify-end">
-          <TouchableOpacity className=" bg-primaryBlue p-2 rounded-3xl">
+          <TouchableOpacity
+            onPress={DownloadReceipt}
+            className=" bg-primaryBlue p-2 rounded-3xl"
+          >
             <Text className="text-white font-semibold text-center">
               Recepit
             </Text>

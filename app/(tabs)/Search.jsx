@@ -11,9 +11,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import SearchCard from "../../components/SearchCard";
-import { getMethod } from "../../utils/apiService"; // API Service
-import { Picker } from "@react-native-picker/picker"; // Dropdown
+import { getMethod } from "../../utils/apiService";
+import { Picker } from "@react-native-picker/picker";
 import { Dropdown } from "react-native-element-dropdown";
+import NoDataCard from "../../components/NoDataCard";
 
 const states = [
   { label: "Andhra Pradesh", value: "andhra_pradesh" },
@@ -196,22 +197,21 @@ const Search = () => {
         <Text className="text-white font-bold text-lg">Search</Text>
       </TouchableOpacity>
 
-      {/* Search Results */}
       <View className="w-full">
         <Text className="text-xl font-semibold">Results</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
-        ) : results?.length > 0 ? (
-          <FlatList
-            data={results}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => <SearchCard data={item} />}
-          />
-        ) : (
-          <Text className="text-gray-500 text-center mt-4">
-            No results found
-          </Text>
-        )}
+        ) : results ? (
+          results.length > 0 ? (
+            <FlatList
+              data={results}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => <SearchCard data={item} />}
+            />
+          ) : (
+            <NoDataCard />
+          )
+        ) : null}
       </View>
     </SafeAreaView>
   );

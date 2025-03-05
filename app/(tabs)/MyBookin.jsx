@@ -4,6 +4,7 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,16 +13,20 @@ import BookingCard from "../../components/BookingCard";
 import { router } from "expo-router";
 import { getMethod } from "../../utils/apiService";
 import useAuth from "../../context/AuthContext";
+import NoDataCard from "../../components/NoDataCard";
 
 const MyBookin = () => {
   const [userData, setuserData] = useState();
+  const [loader, setloader] = useState(false);
   const [data, setdata] = useState();
   const { token } = useAuth();
 
   const getData = async () => {
+    setloader(true);
     const res = await getMethod(`booking`, token);
     console.log("nj ", res.data);
     setdata(res?.data);
+    setloader(false);
   };
 
   // const GetUser = async () => {
@@ -57,15 +62,22 @@ const MyBookin = () => {
           placeholder="Search"
         />
       </View>
-
       <View className="w-full">
         <Text className=" text-xl font-semibold">Bookings</Text>
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.toString()}
-          renderItem={({ item }) => <BookingCard data={item} />}
-          showsVerticalScrollIndicator={false}
-        />
+        {loader ? (
+          <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
+        ) : data ? (
+          data.length > 0 ? (
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.toString()}
+              renderItem={({ item }) => <BookingCard data={item} />}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <NoDataCard />
+          )
+        ) : null}
       </View>
     </SafeAreaView>
   );

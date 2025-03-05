@@ -17,6 +17,7 @@ const { width } = Dimensions.get("window");
 
 import Slide1 from "../assets/images/landingPageSlide1.png";
 import Slide2 from "../assets/images/landingPageSlide2.png";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const slides = [
   {
