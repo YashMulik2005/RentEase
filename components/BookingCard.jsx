@@ -1,30 +1,88 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  Button,
-  Alert,
-} from "react-native";
-import React from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
 import moment from "moment";
-import { getMethod } from "../utils/apiService";
+import axios from "axios";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import * as MediaLibrary from "expo-media-library";
+import * as Print from "expo-print";
+import { Alert, Platform } from "react-native";
+import * as Permissions from "expo-permissions";
+import * as DocumentPicker from "expo-document-picker";
+import * as IntentLauncher from "expo-intent-launcher";
 
 const BookingCard = ({ data }) => {
-  const DownloadReceipt = async (receiptId) => {
-    // try {
-    //   const receiptUrl = `https://your-api-url.com/booking/receipt/${receiptId}`;
-    //   const fileUri = FileSystem.documentDirectory + "receipt.pdf";
-    //   const { uri } = await FileSystem.downloadAsync(receiptUrl, fileUri);
-    //   if (await Sharing.isAvailableAsync()) {
-    //     await Sharing.shareAsync(uri);
-    //   } else {
-    //     Alert.alert("Downloaded", "Receipt saved at: " + uri);
-    //   }
-    // } catch (error) {
-    //   Alert.alert("Error", "Failed to download receipt.");
-    //   console.error(error);
-    // }
+  const [downloading, setDownloading] = useState(false);
+  const [receiptHTML, setreceiptHTML] = useState(null);
+
+  const DownloadReceipt = async () => {
+    setDownloading(true);
+
+    try {
+      const res = await axios.post(
+        "https://rent-ease-bcakend-v2.vercel.app/api/booking/receipt",
+        { booking: data }
+      );
+
+      const receiptHTML = res?.data;
+
+      if (!receiptHTML) {
+        Alert.alert("Error", "Failed to generate receipt.");
+        setDownloading(false);
+        return;
+      }
+
+      const { uri } = await Print.printToFileAsync({
+        html: receiptHTML,
+        base64: false,
+      });
+
+      console.log("Generated PDF URI:", uri);
+
+      const fileName = `${data?._id}_receipt.pdf`;
+
+      if (Platform.OS === "android") {
+        const permissions =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+        if (!permissions.granted) {
+          Alert.alert(
+            "Permission Denied",
+            "Cannot save the file without permission."
+          );
+          return;
+        }
+        const directoryUri = permissions.directoryUri;
+        await FileSystem.StorageAccessFramework.createFileAsync(
+          directoryUri,
+          fileName,
+          "application/pdf"
+        )
+          .then(async (newUri) => {
+            await FileSystem.writeAsStringAsync(
+              newUri,
+              await FileSystem.readAsStringAsync(uri, {
+                encoding: FileSystem.EncodingType.Base64,
+              }),
+              {
+                encoding: FileSystem.EncodingType.Base64,
+              }
+            );
+            Alert.alert("Success", "Receipt saved to Documents.");
+          })
+          .catch((err) => console.error("Error saving file:", err));
+      } else {
+        await Sharing.shareAsync(uri, {
+          mimeType: "application/pdf",
+          dialogTitle: "Save Receipt",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Something went wrong while downloading.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -74,10 +132,13 @@ const BookingCard = ({ data }) => {
         <View className=" w-[20%] flex flex-col justify-end">
           <TouchableOpacity
             onPress={DownloadReceipt}
-            className=" bg-primaryBlue p-2 rounded-3xl"
+            disabled={downloading}
+            className={`${
+              downloading ? "bg-gray-400" : "bg-primaryBlue"
+            } p-2 rounded-3xl`}
           >
             <Text className="text-white font-semibold text-center">
-              Recepit
+              {downloading ? "Loading..." : "Receipt"}
             </Text>
           </TouchableOpacity>
         </View>

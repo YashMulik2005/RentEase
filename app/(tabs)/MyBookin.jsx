@@ -24,7 +24,7 @@ const MyBookin = () => {
   const getData = async () => {
     setloader(true);
     const res = await getMethod(`booking`, token);
-    console.log("nj ", res.data);
+    // console.log("nj ", res.data);
     setdata(res?.data);
     setloader(false);
   };
@@ -70,7 +70,7 @@ const MyBookin = () => {
           data.length > 0 ? (
             <FlatList
               data={data}
-              keyExtractor={(item) => item.toString()}
+              keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => <BookingCard data={item} />}
               showsVerticalScrollIndicator={false}
             />

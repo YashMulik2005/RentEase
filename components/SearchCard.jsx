@@ -17,7 +17,7 @@ const SearchCard = ({ data }) => {
           source={{ uri: data?.titleImage }}
         />
       </View>
-      <View className=" relative w-[70%] flex flex-col gap-1">
+      <View className=" w-[70%] flex flex-col">
         <View className=" flex flex-row justify-between">
           <Text className=" w-[75%] font-bold text-xl">
             {data?.owner_id?.hotelName}
@@ -28,10 +28,10 @@ const SearchCard = ({ data }) => {
           </View>
         </View>
         <Text className=" w-full text-gray">
-          {data?.owner_id?.apartment} {data?.owner_id?.city}
+          {data?.owner_id?.apartment}, {data?.owner_id?.city}
         </Text>
         <Text numberOfLines={1}>{data?.description}</Text>
-        <Text className=" absolute bottom-1 text-primaryBlue font-bold text-lg mt-2">
+        <Text className=" text-primaryBlue font-bold">
           {data?.price?.$numberDecimal} ₹/day
         </Text>
       </View>
