@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import { getMethod } from "../../utils/apiService";
 import useAuth from "../../context/AuthContext";
 import NoDataCard from "../../components/NoDataCard";
+import { StatusBar } from "expo-status-bar";
 
 const MyBookin = () => {
   const [userData, setuserData] = useState();
@@ -79,6 +80,7 @@ const MyBookin = () => {
           )
         ) : null}
       </View>
+      <StatusBar style="dark" backgroundColor="#F5F5F6" />
     </SafeAreaView>
   );
 };

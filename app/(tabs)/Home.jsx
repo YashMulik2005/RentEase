@@ -143,7 +143,7 @@ const Home = () => {
           </View>
         </ScrollView>
       )}
-      <StatusBar />
+      <StatusBar style="drak" backgroundColor="#F5F5F6" />
     </SafeAreaView>
   );
 };

@@ -40,7 +40,7 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="bg-secondaryBackground h-full">
+    <SafeAreaView className="bg-secondaryBackground h-full relative">
       <View className="flex flex-col items-center h-full w-full bg-[#4C4DDC]">
         <View className="h-[20%] w-full">
           <LinearGradient
@@ -86,6 +86,14 @@ const Profile = () => {
                 Logout
               </Text>
             </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("../SellerAuth/Login")}
+            className=" absolute bottom-5"
+          >
+            <Text className=" text-blue-500 text-md">
+              Create Seller Account
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

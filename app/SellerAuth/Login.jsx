@@ -29,7 +29,7 @@ const Login = () => {
       </View>
       <TouchableOpacity
         onPress={() => {
-          router.push("/(tabs)/Home");
+          router.push("/SellerTabs/Home");
         }}
         className=" bg-primaryBlue p-4 rounded-xl"
       >

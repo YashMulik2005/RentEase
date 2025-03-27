@@ -15,6 +15,7 @@ import { getMethod } from "../../utils/apiService";
 import { Picker } from "@react-native-picker/picker";
 import { Dropdown } from "react-native-element-dropdown";
 import NoDataCard from "../../components/NoDataCard";
+import { StatusBar } from "expo-status-bar";
 
 const states = [
   { label: "Andhra Pradesh", value: "andhra_pradesh" },
@@ -213,6 +214,7 @@ const Search = () => {
           )
         ) : null}
       </View>
+      <StatusBar style="dark" backgroundColor="#F5F5F6" />
     </SafeAreaView>
   );
 };
