@@ -49,7 +49,7 @@ const LandingPage = () => {
 
   return (
     <SafeAreaView className="h-full w-full bg-primaryBackground flex justify-center items-center">
-      <View className="w-full h-[70%]">
+      <View className="w-full h-[75%]">
         <FlatList
           data={slides}
           keyExtractor={(item) => item.id}

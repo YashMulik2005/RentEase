@@ -7,9 +7,6 @@ import * as Sharing from "expo-sharing";
 import * as MediaLibrary from "expo-media-library";
 import * as Print from "expo-print";
 import { Alert, Platform } from "react-native";
-import * as Permissions from "expo-permissions";
-import * as DocumentPicker from "expo-document-picker";
-import * as IntentLauncher from "expo-intent-launcher";
 
 const BookingCard = ({ data }) => {
   const [downloading, setDownloading] = useState(false);
