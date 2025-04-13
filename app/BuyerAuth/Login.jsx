@@ -38,6 +38,9 @@ const Login = () => {
         console.log(res?.data?.token);
         settoken(res?.data?.token);
         await AsyncStorage.setItem("user", JSON.stringify(result?.data));
+        if (await AsyncStorage.getItem("owner")) {
+          await AsyncStorage.removeItem("owner");
+        }
         setlocation(null);
         router.push("/(tabs)/Home");
       }

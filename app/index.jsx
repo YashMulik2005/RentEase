@@ -9,13 +9,23 @@ import { router } from "expo-router";
 const index = () => {
   const [loader, setloader] = useState(true);
   const getUser = async () => {
-    const user = await AsyncStorage.getItem("token");
-    if (user) {
-      router.push("./(tabs)/Home");
-    } else {
+    try {
+      const user = await AsyncStorage.getItem("user");
+      const owner = await AsyncStorage.getItem("owner");
+
+      if (user) {
+        router.push("./(tabs)/Home");
+      } else if (owner) {
+        router.push("SellerTabs/Home");
+      } else {
+        router.push("./LandingPage");
+      }
+    } catch (error) {
+      console.error("Error checking auth:", error);
       router.push("./LandingPage");
+    } finally {
+      setloader(false);
     }
-    setloader(false);
   };
 
   useEffect(() => {

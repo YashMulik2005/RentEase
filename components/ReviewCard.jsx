@@ -1,8 +1,13 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
 import { AntDesign } from "@expo/vector-icons";
+import moment from "moment";
 
-const ReviewCard = () => {
+const ReviewCard = ({ data }) => {
+  console.log(data);
+  const filledStars = data?.rating || 0;
+  const totalStars = 5;
+
   return (
     <View className=" bg-white my-2 rounded-lg p-4 w-full">
       <View className="flex flex-row justify-between mb-1 w-full">
@@ -13,23 +18,24 @@ const ReviewCard = () => {
           />
         </View>
         <View className=" w-[80%]">
-          <Text className=" text-xl font-bold">John Dev</Text>
-          <Text className=" text-gray">May 12, 2024</Text>
+          <Text className=" text-xl font-bold">{data.user_id.username}</Text>
+          <Text className=" text-gray">
+            {moment(data.created_at).startOf("day").fromNow()}
+          </Text>
         </View>
       </View>
       <View>
         <View className=" flex flex-row gap-1 mb-1">
-          <AntDesign name="star" size={18} color="#FFD700" />
-          <AntDesign name="star" size={18} color="#FFD700" />
-          <AntDesign name="star" size={18} color="#FFD700" />
-          <AntDesign name="star" size={18} color="#FFD700" />
-          <AntDesign name="staro" size={18} color="black" />
+          {[...Array(totalStars)].map((_, index) => (
+            <AntDesign
+              key={index}
+              name={index < filledStars ? "star" : "staro"}
+              size={18}
+              color={index < filledStars ? "#FFD700" : "black"}
+            />
+          ))}
         </View>
-        <Text>
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s
-        </Text>
+        <Text>{data?.review_text}</Text>
       </View>
     </View>
   );

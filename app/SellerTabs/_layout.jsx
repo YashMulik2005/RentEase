@@ -23,6 +23,7 @@ const BuyerTabs = () => {
           borderTopWidth: 0,
           height: 55,
         },
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen

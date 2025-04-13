@@ -1,8 +1,10 @@
 import { View, Text, ScrollView, Dimensions, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { LineChart, ContributionGraph, BarChart } from "react-native-chart-kit";
+import useAuth from "../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -31,6 +33,7 @@ const commitsData = [
 ];
 
 const Home = () => {
+  const {} = useAuth();
   const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
@@ -52,15 +55,35 @@ const Home = () => {
     ],
   };
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("owner");
+        if (userData) {
+          setUser(JSON.parse(userData));
+          console.log(JSON.parse(userData));
+        }
+      } catch (error) {
+        console.error("Failed to load user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <SafeAreaView className=" w-full">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="bg-tabBackground w-full p-3 flex flex-col items-center">
           <View className="w-full flex flex-row justify-between mb-3 items-center">
-            <Text className="font-bold text-xl">Hotel Name</Text>
+            <Text className="font-bold text-xl">{user?.hotelName}</Text>
             <View className="h-11 w-11 rounded-full border">
               <Image
-                source={require("../../assets/images/defaultProfile.png")}
+                source={{
+                  uri: "https://img.freepik.com/free-photo/view-building-with-cartoon-style-architecture_23-2151154935.jpg?semt=ais_hybrid&w=740",
+                }}
                 className="h-full w-full rounded-full"
               />
             </View>
