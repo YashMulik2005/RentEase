@@ -5,6 +5,8 @@ import {
   TextInput,
   ScrollView,
   Modal,
+  Alert,
+  Linking
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +16,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import useAuth from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { postMethod } from "../../utils/apiService";
+import { WebView } from 'react-native-webview';
 
 const ResidentDeatils = () => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -36,6 +39,9 @@ const ResidentDeatils = () => {
   const [totalAmount, setTotalAmount] = useState(
     (amount + parseFloat(tax) + parseFloat(platformCharge)).toFixed(2)
   );
+
+  const [showRazorpay, setShowRazorpay] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   console.log(bookingDetails);
   const genderData = [
@@ -66,16 +72,100 @@ const ResidentDeatils = () => {
     setuserData(user);
   };
 
-  const bookRoom = async () => {
+  const generateOrderHTML = () => {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        </head>
+        <body>
+          <script>
+            const options = {
+              key: 'rzp_test_3kPXwIYYdt9LSC',
+              amount: ${Math.round(parseFloat(totalAmount) * 100)},
+              currency: 'INR',
+              name: 'HotelEase',
+              description: 'Hotel Booking Payment',
+              image: 'https://your-logo-url.png',
+              prefill: {
+                email: 'user@example.com',
+                contact: '9999999999',
+                name: 'User Name'
+              },
+              theme: {
+                color: '#53a20e'
+              },
+              handler: function(response) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  status: 'success',
+                  ...response
+                }));
+              },
+              modal: {
+                ondismiss: function() {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({
+                    status: 'dismissed'
+                  }));
+                }
+              }
+            };
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(response) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                status: 'failed',
+                error: response.error
+              }));
+            });
+            rzp.open();
+          </script>
+        </body>
+      </html>
+    `;
+  };
+
+  const handlePaymentResponse = async (response) => {
     try {
-      const res = await postMethod("booking", bookingDetails, userData);
-      if (res.status == 201) {
-        console.log("room booked");
-        router.push("../(tabs)/MyBookin");
+      const paymentData = JSON.parse(response);
+      console.log('Payment Response:', paymentData);
+
+      if (paymentData.status === 'success' && paymentData.razorpay_payment_id) {
+        // Payment successful
+        const res = await postMethod("booking", {
+          ...bookingDetails,
+          total_guests: bookingDetails.guest_details.length,
+          amount: totalAmount,
+          payment_id: paymentData.razorpay_payment_id
+        }, userData);
+
+        if (res.status == 201) {
+          Alert.alert('Success', 'Payment successful and room booked!');
+          setShowRazorpay(false);
+          setpaymentModal(false);
+          router.push("../(tabs)/MyBookin");
+        }
+      } else if (paymentData.status === 'failed') {
+        Alert.alert('Payment Failed', paymentData.error?.description || 'Payment was unsuccessful');
+      } else if (paymentData.status === 'dismissed') {
+        Alert.alert('Payment Cancelled', 'You cancelled the payment');
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error('Payment Error:', error);
+      Alert.alert('Error', 'Payment processing failed. Please try again.');
+    } finally {
+      setPaymentProcessing(false);
     }
+  };
+
+  const startPayment = () => {
+    if (!bookingDetails?.guest_details?.length) {
+      Alert.alert('Error', 'Please add at least one resident before making payment');
+      return;
+    }
+    setShowRazorpay(true);
+    setPaymentProcessing(true);
+    setpaymentModal(false);
   };
 
   useEffect(() => {
@@ -187,55 +277,96 @@ const ResidentDeatils = () => {
         </View>
       </View>
 
+      {showRazorpay && (
+        <Modal
+          visible={showRazorpay}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => {
+            if (!paymentProcessing) {
+              setShowRazorpay(false);
+            }
+          }}
+        >
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 10 }}>
+              <TouchableOpacity 
+                onPress={() => {
+                  if (!paymentProcessing) {
+                    setShowRazorpay(false);
+                  }
+                }}
+              >
+                <MaterialIcons name="close" size={30} color="black" />
+              </TouchableOpacity>
+            </View>
+            <WebView
+              source={{ html: generateOrderHTML() }}
+              onMessage={(event) => {
+                handlePaymentResponse(event.nativeEvent.data);
+              }}
+              onError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.warn('WebView error: ', nativeEvent);
+              }}
+              onHttpError={(syntheticEvent) => {
+                const { nativeEvent } = syntheticEvent;
+                console.warn('WebView HTTP error: ', nativeEvent);
+              }}
+            />
+          </View>
+        </Modal>
+      )}
+
       <Modal
         visible={paymentModal}
         animationType="slide"
         transparent={true}
-        className=" relative"
+        className="relative"
         onRequestClose={() => setpaymentModal(false)}
       >
-        <View className=" w-full p-5 absolute bottom-0 bg-tabBackground">
-          <View className=" flex flex-row justify-end w-full">
+        <View className="w-full p-5 absolute bottom-0 bg-tabBackground">
+          <View className="flex flex-row justify-end w-full">
             <TouchableOpacity
               onPress={() => setpaymentModal(false)}
-              className=" my-2"
+              className="my-2"
             >
               <MaterialIcons name="cancel" size={27} color="black" />
             </TouchableOpacity>
           </View>
           <View>
-            <View className=" flex flex-col gap-2">
-              <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">Hotel charge:</Text>
-                <Text className=" text-xl font-bold text-primaryBlue">
+            <View className="flex flex-col gap-2">
+              <View className="flex flex-row justify-between">
+                <Text className="text-xl font-bold">Hotel charge:</Text>
+                <Text className="text-xl font-bold text-primaryBlue">
                   {amount} ₹
                 </Text>
               </View>
-              <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">
-                  Tax <Text className=" font-normal text-zinc-500">(5%) </Text>:
+              <View className="flex flex-row justify-between">
+                <Text className="text-xl font-bold">
+                  Tax <Text className="font-normal text-zinc-500">(5%) </Text>:
                 </Text>
-                <Text className=" text-xl font-bold text-primaryBlue">
+                <Text className="text-xl font-bold text-primaryBlue">
                   {tax} ₹
                 </Text>
               </View>
-              <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">
+              <View className="flex flex-row justify-between">
+                <Text className="text-xl font-bold">
                   Platform charges{" "}
-                  <Text className=" font-normal text-zinc-500">(1%) </Text>:
+                  <Text className="font-normal text-zinc-500">(1%) </Text>:
                 </Text>
-                <Text className=" text-xl font-bold text-primaryBlue">
+                <Text className="text-xl font-bold text-primaryBlue">
                   {platformCharge} ₹
                 </Text>
               </View>
-              <View className=" flex flex-row justify-between">
-                <Text className=" text-xl font-bold">Total:</Text>
-                <Text className=" text-xl font-bold text-primaryBlue">
+              <View className="flex flex-row justify-between">
+                <Text className="text-xl font-bold">Total:</Text>
+                <Text className="text-xl font-bold text-primaryBlue">
                   {totalAmount} ₹
                 </Text>
               </View>
             </View>
-            <View className=" my-2">
+            <View className="my-2">
               <View className="mb-2">
                 <Text className="text-lg font-semibold text-gray my-[6px]">
                   Apply Coupon:
@@ -249,9 +380,7 @@ const ResidentDeatils = () => {
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => {
-                bookRoom();
-              }}
+              onPress={startPayment}
               className="w-full bg-primaryBlue p-3 my-2 items-center rounded-lg"
             >
               <Text className="text-white font-bold text-lg">Pay</Text>
