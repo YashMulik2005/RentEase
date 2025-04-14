@@ -53,7 +53,9 @@ const Create = () => {
       <View className="w-full h-[94%]">
         <Text className="text-xl font-semibold">Results</Text>
         {loading ? (
-          <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
+          <View className=" w-full h-full flex justify-center items-center">
+            <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
+          </View>
         ) : results ? (
           results.length > 0 ? (
             <FlatList
@@ -70,7 +72,7 @@ const Create = () => {
       <View className=" absolute bottom-4 flex justify-center items-center right-2 bg-primaryBlue rounded-xl p-3 px-5">
         <TouchableOpacity
           onPress={() => {
-            router.push("/SellerTabs/Room");
+            router.push("Rooms");
           }}
         >
           <Text className=" text-3xl text-white">+</Text>

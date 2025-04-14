@@ -8,6 +8,7 @@ import {
   Fontisto,
   MaterialIcons,
   AntDesign,
+  Ionicons,
 } from "@expo/vector-icons";
 
 const BuyerTabs = () => {
@@ -54,8 +55,8 @@ const BuyerTabs = () => {
         name="Booked"
         options={{
           tabBarIcon: ({ color, focused }) => {
-            <AntDesign
-              name={focused ? "checksquare" : "checksquareo"}
+            <Ionicons
+              name={focused ? "checkmark-circle" : "checkmark-circle"}
               size={24}
               color={color}
             />;

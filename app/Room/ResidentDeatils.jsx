@@ -6,7 +6,7 @@ import {
   ScrollView,
   Modal,
   Alert,
-  Linking
+  Linking,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +16,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import useAuth from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { postMethod } from "../../utils/apiService";
-import { WebView } from 'react-native-webview';
+import { WebView } from "react-native-webview";
 
 const ResidentDeatils = () => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -128,31 +128,38 @@ const ResidentDeatils = () => {
   const handlePaymentResponse = async (response) => {
     try {
       const paymentData = JSON.parse(response);
-      console.log('Payment Response:', paymentData);
+      console.log("Payment Response:", paymentData);
 
-      if (paymentData.status === 'success' && paymentData.razorpay_payment_id) {
+      if (paymentData.status === "success" && paymentData.razorpay_payment_id) {
         // Payment successful
-        const res = await postMethod("booking", {
-          ...bookingDetails,
-          total_guests: bookingDetails.guest_details.length,
-          amount: totalAmount,
-          payment_id: paymentData.razorpay_payment_id
-        }, userData);
+        const res = await postMethod(
+          "booking",
+          {
+            ...bookingDetails,
+            total_guests: bookingDetails.guest_details.length,
+            amount: totalAmount,
+            payment_id: paymentData.razorpay_payment_id,
+          },
+          userData
+        );
 
         if (res.status == 201) {
-          Alert.alert('Success', 'Payment successful and room booked!');
+          Alert.alert("Success", "Payment successful and room booked!");
           setShowRazorpay(false);
           setpaymentModal(false);
           router.push("../(tabs)/MyBookin");
         }
-      } else if (paymentData.status === 'failed') {
-        Alert.alert('Payment Failed', paymentData.error?.description || 'Payment was unsuccessful');
-      } else if (paymentData.status === 'dismissed') {
-        Alert.alert('Payment Cancelled', 'You cancelled the payment');
+      } else if (paymentData.status === "failed") {
+        Alert.alert(
+          "Payment Failed",
+          paymentData.error?.description || "Payment was unsuccessful"
+        );
+      } else if (paymentData.status === "dismissed") {
+        Alert.alert("Payment Cancelled", "You cancelled the payment");
       }
     } catch (error) {
-      console.error('Payment Error:', error);
-      Alert.alert('Error', 'Payment processing failed. Please try again.');
+      console.error("Payment Error:", error);
+      Alert.alert("Error", "Payment processing failed. Please try again.");
     } finally {
       setPaymentProcessing(false);
     }
@@ -160,7 +167,10 @@ const ResidentDeatils = () => {
 
   const startPayment = () => {
     if (!bookingDetails?.guest_details?.length) {
-      Alert.alert('Error', 'Please add at least one resident before making payment');
+      Alert.alert(
+        "Error",
+        "Please add at least one resident before making payment"
+      );
       return;
     }
     setShowRazorpay(true);
@@ -182,7 +192,7 @@ const ResidentDeatils = () => {
                 Name:
               </Text>
               <TextInput
-                className="border border-gray px-4 py-3 rounded-lg text-lg"
+                className=" bg-zinc-100 px-4 py-4 rounded-lg text-lg"
                 value={currentResident.name}
                 onChangeText={(text) =>
                   setCurrentResident({ ...currentResident, name: text })
@@ -194,11 +204,14 @@ const ResidentDeatils = () => {
               <View className="flex flex-col gap-3 w-[48%]">
                 <Text className="text-lg font-semibold text-gray">Age:</Text>
                 <TextInput
-                  className="border border-gray px-4 py-3 rounded-lg text-lg"
+                  className="bg-zinc-100 px-4 py-4 rounded-lg text-lg"
                   keyboardType="numeric"
                   value={currentResident.age}
                   onChangeText={(text) =>
-                    setCurrentResident({ ...currentResident, age: text })
+                    setCurrentResident({
+                      ...currentResident,
+                      age: text,
+                    })
                   }
                   placeholder="Age"
                 />
@@ -218,7 +231,7 @@ const ResidentDeatils = () => {
                     })
                   }
                   style={{
-                    borderColor: "gray",
+                    borderColor: "#f4f4f5",
                     borderWidth: 1,
                     borderRadius: 8,
                     paddingHorizontal: 10,
@@ -242,9 +255,11 @@ const ResidentDeatils = () => {
 
           <View className="mt-4 h-[70%]">
             <ScrollView>
-              <Text className="text-xl font-semibold text-gray">
-                Residents:
-              </Text>
+              {residents.length > 0 && (
+                <Text className="text-xl font-semibold text-gray">
+                  Residents:
+                </Text>
+              )}
               {residents.length > 0 ? (
                 residents.map((resident, index) => (
                   <View key={index} className="mb-2">
@@ -254,7 +269,7 @@ const ResidentDeatils = () => {
                   </View>
                 ))
               ) : (
-                <Text>No residents added yet.</Text>
+                <Text></Text>
               )}
             </ScrollView>
           </View>
@@ -288,9 +303,15 @@ const ResidentDeatils = () => {
             }
           }}
         >
-          <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 10 }}>
-              <TouchableOpacity 
+          <View style={{ flex: 1, backgroundColor: "white" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                padding: 10,
+              }}
+            >
+              <TouchableOpacity
                 onPress={() => {
                   if (!paymentProcessing) {
                     setShowRazorpay(false);
@@ -307,11 +328,11 @@ const ResidentDeatils = () => {
               }}
               onError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
-                console.warn('WebView error: ', nativeEvent);
+                console.warn("WebView error: ", nativeEvent);
               }}
               onHttpError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
-                console.warn('WebView HTTP error: ', nativeEvent);
+                console.warn("WebView HTTP error: ", nativeEvent);
               }}
             />
           </View>
@@ -366,19 +387,19 @@ const ResidentDeatils = () => {
                 </Text>
               </View>
             </View>
-            <View className="my-2">
-              <View className="mb-2">
-                <Text className="text-lg font-semibold text-gray my-[6px]">
-                  Apply Coupon:
-                </Text>
-                <TextInput
-                  className="border border-gray px-4 py-3 rounded-lg text-lg"
-                  value={couponCode}
-                  onChangeText={(text) => setcouponCode(text)}
-                  placeholder="Coupon Code"
-                />
-              </View>
-            </View>
+            {/* <View className="my-2">
+                      <View className="mb-2">
+                        <Text className="text-lg font-semibold text-gray my-[6px]">
+                          Apply Coupon:
+                        </Text>
+                        <TextInput
+                          className="border border-gray px-4 py-3 rounded-lg text-lg"
+                          value={couponCode}
+                          onChangeText={(text) => setcouponCode(text)}
+                          placeholder="Coupon Code"
+                        />
+                      </View>
+                    </View> */}
             <TouchableOpacity
               onPress={startPayment}
               className="w-full bg-primaryBlue p-3 my-2 items-center rounded-lg"

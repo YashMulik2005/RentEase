@@ -55,17 +55,19 @@ const Booked = () => {
         <View className="w-[10%]">{/* <Text>nibu</Text> */}</View>
       </View>
 
-      <View className="w-full">
+      {/* <View className="w-full">
         <TextInput
           className=" w-full bg-zinc-200 px-4 py-3 rounded-lg text-lg"
           keyboardType="ascii-capable"
           placeholder="Search"
         />
-      </View>
+      </View> */}
       <View className="w-full">
-        <Text className=" text-xl font-semibold">Bookings</Text>
+        {/* <Text className=" text-xl font-semibold">Bookings</Text> */}
         {loader ? (
-          <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
+          <View className=" w-full h-full flex justify-center items-center">
+            <ActivityIndicator size="large" color="#4C4DDC" className="mt-4" />
+          </View>
         ) : data ? (
           data.length > 0 ? (
             <FlatList

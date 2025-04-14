@@ -16,8 +16,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage, {
   useAsyncStorage,
 } from "@react-native-async-storage/async-storage";
-import useAuth from "../../context/AuthContext";
-import { postMethod } from "../../utils/apiService";
+import useAuth from "../context/AuthContext";
+import { postMethod } from "../utils/apiService";
 
 const Room = () => {
   const router = useRouter();

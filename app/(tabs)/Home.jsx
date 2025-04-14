@@ -21,6 +21,8 @@ const Home = () => {
   const { location, setlocation, username } = useAuth();
   const [radomRoomsData, setradomRoomsData] = useState();
   const [locationRooms, setlocationRooms] = useState();
+  const [randomloader, setrandomloader] = useState(false);
+  const [locationRoomLoader, setlocationRoomLoader] = useState(false);
 
   const checkPermissionAndGetLocation = async () => {
     setlocationLoader(true);
@@ -77,15 +79,19 @@ const Home = () => {
   }, []);
 
   const getRandomData = async () => {
+    setrandomloader(true);
     const res = await getMethod("room/random");
     setradomRoomsData(res.data);
+    setrandomloader(false);
   };
 
   const getRoomsByLocation = async () => {
+    setlocationRoomLoader(true);
     const res = await getMethod(
       `room/location/${location.city}/${location.state}`
     );
     setlocationRooms(res.data);
+    setlocationRoomLoader(false);
   };
 
   useEffect(() => {
@@ -98,7 +104,7 @@ const Home = () => {
   return (
     <SafeAreaView className=" bg-tabBackground h-full p-4 flex flex-col items-center gap-6">
       {locationLoader ? (
-        <View className=" h-full w-full">
+        <View className=" h-full w-full flex justify-center items-center">
           <ActivityIndicator size="large" color="#4C4DDC" />
         </View>
       ) : (
@@ -114,31 +120,45 @@ const Home = () => {
                 <Text className=" text-xl font-bold">{`${location?.city}, ${location?.state}`}</Text>
               </View>
             </View>
-            <View>
+            {/* <View>
               <FilterList />
-            </View>
+            </View> */}
             <View className=" w-full flex flex-col gap-3">
               <Text className=" text-xl font-bold pl-1">Near location</Text>
               <View>
-                <FlatList
-                  data={locationRooms}
-                  keyExtractor={(item) => item?._id.toString()}
-                  renderItem={({ item }) => <HotelCard data={item} />}
-                  horizontal
-                  // showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  //numColumns={2}
-                />
+                {locationRoomLoader ? (
+                  <ActivityIndicator
+                    size="large"
+                    color="#4C4DDC"
+                    className="mt-4"
+                  />
+                ) : (
+                  <FlatList
+                    data={locationRooms}
+                    keyExtractor={(item) => item?._id.toString()}
+                    renderItem={({ item }) => <HotelCard data={item} />}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                  />
+                )}
               </View>
             </View>
             <View className=" w-full">
               <Text className="text-xl font-bold pl-1">Popular hotels</Text>
-              <FlatList
-                data={radomRoomsData}
-                keyExtractor={(item) => item?._id.toString()}
-                renderItem={({ item }) => <SearchCard data={item} />}
-                showsVerticalScrollIndicator={false}
-              />
+              {randomloader ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#4C4DDC"
+                  className="mt-4"
+                />
+              ) : (
+                <FlatList
+                  data={radomRoomsData}
+                  keyExtractor={(item) => item?._id.toString()}
+                  renderItem={({ item }) => <SearchCard data={item} />}
+                  showsVerticalScrollIndicator={false}
+                />
+              )}
             </View>
           </View>
         </ScrollView>
